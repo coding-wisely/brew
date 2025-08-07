@@ -2,9 +2,9 @@
 
 namespace CodingWisely\LaravelBrew\Tests;
 
+use CodingWisely\LaravelBrew\LaravelBrewServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use CodingWisely\LaravelBrew\LaravelBrewServiceProvider;
 
 class TestCase extends Orchestra
 {

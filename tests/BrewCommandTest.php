@@ -1,8 +1,7 @@
 <?php
 
-use CodingWisely\LaravelBrew\Commands\LaravelBrewCommand;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 beforeEach(function () {
     // Set up a test token
@@ -22,12 +21,12 @@ it('can list products', function () {
                             'id' => 'var_test123',
                             'name' => '12oz',
                             'price' => 2200,
-                        ]
+                        ],
                     ],
                     'subscription' => 'allowed',
-                ]
-            ]
-        ], 200)
+                ],
+            ],
+        ], 200),
     ]);
 
     $this->artisan('brew', ['action' => 'list'])
@@ -46,8 +45,8 @@ it('can order a product', function () {
                     'street1' => '123 Test St',
                     'city' => 'Test City',
                     'country' => 'US',
-                ]
-            ]
+                ],
+            ],
         ], 200),
         '*/card' => Http::response([
             'data' => [
@@ -55,8 +54,8 @@ it('can order a product', function () {
                     'id' => 'crd_test123',
                     'brand' => 'Visa',
                     'last4' => '4242',
-                ]
-            ]
+                ],
+            ],
         ], 200),
     ]);
 
@@ -79,14 +78,14 @@ it('shows cart contents', function () {
                     'productVariantID' => 'var_test123',
                     'quantity' => 2,
                     'subtotal' => 4400,
-                ]
+                ],
             ],
             'subtotal' => 4400,
             'shipping' => [
                 'service' => 'USPS Ground',
                 'timeframe' => '3-5 days',
-            ]
-        ], 200)
+            ],
+        ], 200),
     ]);
 
     $this->artisan('brew', ['action' => 'cart'])
@@ -96,7 +95,7 @@ it('shows cart contents', function () {
 
 it('shows empty cart message', function () {
     Http::fake([
-        '*/cart' => Http::response(['items' => []], 200)
+        '*/cart' => Http::response(['items' => []], 200),
     ]);
 
     $this->artisan('brew', ['action' => 'cart'])
@@ -116,10 +115,10 @@ it('shows order status', function () {
                         'status' => 'DELIVERED',
                         'number' => '1234567890',
                         'statusDetails' => 'Delivered to mailbox',
-                    ]
-                ]
-            ]
-        ], 200)
+                    ],
+                ],
+            ],
+        ], 200),
     ]);
 
     $this->artisan('brew', ['action' => 'status'])
@@ -135,8 +134,8 @@ it('shows user profile', function () {
                 'name' => 'John Doe',
                 'email' => 'john@example.com',
                 'fingerprint' => '123456-7890',
-            ]
-        ], 200)
+            ],
+        ], 200),
     ]);
 
     $this->artisan('brew', ['action' => 'profile'])
@@ -153,7 +152,7 @@ it('creates a subscription', function () {
             'schedule' => [
                 'type' => 'weekly',
                 'interval' => 2,
-            ]
+            ],
         ], 200),
         '*/address' => Http::response([
             'data' => [
@@ -163,8 +162,8 @@ it('creates a subscription', function () {
                     'street1' => '123 Test St',
                     'city' => 'Test City',
                     'country' => 'US',
-                ]
-            ]
+                ],
+            ],
         ], 200),
         '*/card' => Http::response([
             'data' => [
@@ -172,8 +171,8 @@ it('creates a subscription', function () {
                     'id' => 'crd_test123',
                     'brand' => 'Visa',
                     'last4' => '4242',
-                ]
-            ]
+                ],
+            ],
         ], 200),
     ]);
 
@@ -208,8 +207,8 @@ it('requires variant id for ordering', function () {
 it('uses sandbox mode', function () {
     Http::fake([
         'https://api.dev.terminal.shop/product' => Http::response([
-            'data' => []
-        ], 200)
+            'data' => [],
+        ], 200),
     ]);
 
     $this->artisan('brew', [
@@ -239,7 +238,7 @@ it('handles api errors gracefully', function () {
             'type' => 'authentication',
             'code' => 'unauthorized',
             'message' => 'Invalid token',
-        ], 401)
+        ], 401),
     ]);
 
     $this->artisan('brew', ['action' => 'list'])
@@ -250,7 +249,7 @@ it('handles api errors gracefully', function () {
 
 it('defaults to list action when no action specified', function () {
     Http::fake([
-        '*/product' => Http::response(['data' => []], 200)
+        '*/product' => Http::response(['data' => []], 200),
     ]);
 
     $this->artisan('brew')
@@ -260,9 +259,9 @@ it('defaults to list action when no action specified', function () {
 
 it('uses custom token from command line', function () {
     Config::set('laravel-brew.token', null);
-    
+
     Http::fake([
-        '*/product' => Http::response(['data' => []], 200)
+        '*/product' => Http::response(['data' => []], 200),
     ]);
 
     $this->artisan('brew', [

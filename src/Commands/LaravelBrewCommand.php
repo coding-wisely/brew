@@ -4,7 +4,6 @@ namespace CodingWisely\LaravelBrew\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 
 class LaravelBrewCommand extends Command
 {
@@ -36,6 +35,7 @@ class LaravelBrewCommand extends Command
      * Terminal Shop API base URLs
      */
     protected const API_PRODUCTION = 'https://api.terminal.shop';
+
     protected const API_SANDBOX = 'https://api.dev.terminal.shop';
 
     /**
@@ -44,9 +44,9 @@ class LaravelBrewCommand extends Command
     public function handle(): int
     {
         $action = $this->argument('action') ?? 'list';
-        
-        $this->components->info("☕ Laravel Brew - Terminal Shop Integration");
-        
+
+        $this->components->info('☕ Laravel Brew - Terminal Shop Integration');
+
         try {
             return match ($action) {
                 'list' => $this->listProducts(),
@@ -61,6 +61,7 @@ class LaravelBrewCommand extends Command
             };
         } catch (\Exception $e) {
             $this->components->error("Error: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }
@@ -72,8 +73,8 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching coffee menu', function () {
             $response = $this->apiRequest('GET', '/product');
-            
-            if (!isset($response['data'])) {
+
+            if (! isset($response['data'])) {
                 throw new \Exception('Invalid response from API');
             }
 
@@ -86,21 +87,21 @@ class LaravelBrewCommand extends Command
                     "<fg=yellow>{$product['name']}</>",
                     "<fg=gray>{$product['id']}</>"
                 );
-                
+
                 $this->line("  <fg=gray>{$product['description']}</>");
-                
-                if (!empty($product['variants'])) {
-                    $this->line("  <fg=cyan>Variants:</>");
+
+                if (! empty($product['variants'])) {
+                    $this->line('  <fg=cyan>Variants:</>');
                     foreach ($product['variants'] as $variant) {
                         $price = number_format($variant['price'] / 100, 2);
                         $this->line("    - {$variant['name']}: <fg=green>\${$price}</> <fg=gray>({$variant['id']})</>");
                     }
                 }
-                
+
                 if (isset($product['subscription'])) {
                     $this->line("  <fg=magenta>Subscription: {$product['subscription']}</>");
                 }
-                
+
                 $this->newLine();
             }
 
@@ -120,20 +121,21 @@ class LaravelBrewCommand extends Command
         $quantity = (int) $this->option('quantity');
         $subscribe = $this->option('subscribe');
 
-        if (!$variantId) {
+        if (! $variantId) {
             $this->components->error('Please specify a variant ID with --variant=');
+
             return self::FAILURE;
         }
 
-        $this->components->task('Adding to cart', function () use ($variantId, $quantity, $subscribe) {
+        $this->components->task('Adding to cart', function () use ($variantId, $quantity) {
             // Add to cart
             $response = $this->apiRequest('POST', '/cart', [
                 'items' => [
                     [
                         'variantId' => $variantId,
                         'quantity' => $quantity,
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
             return true;
@@ -158,7 +160,7 @@ class LaravelBrewCommand extends Command
         }
 
         $this->components->success('☕ Added to cart successfully!');
-        
+
         if ($this->confirm('Would you like to checkout now?')) {
             return $this->checkout();
         }
@@ -173,9 +175,10 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching cart', function () {
             $response = $this->apiRequest('GET', '/cart');
-            
+
             if (empty($response['items'])) {
                 $this->components->warn('Your cart is empty');
+
                 return true;
             }
 
@@ -221,9 +224,10 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching orders', function () {
             $response = $this->apiRequest('GET', '/order');
-            
+
             if (empty($response['data'])) {
                 $this->components->warn('No orders found');
+
                 return true;
             }
 
@@ -236,10 +240,10 @@ class LaravelBrewCommand extends Command
                     "Order #{$order['index']}",
                     "<fg=gray>{$order['id']}</>"
                 );
-                
+
                 $created = date('Y-m-d H:i', strtotime($order['created']));
                 $this->line("  Created: <fg=gray>{$created}</>");
-                
+
                 if (isset($order['tracking'])) {
                     $tracking = $order['tracking'];
                     $this->line("  Status: <fg=yellow>{$tracking['status']}</>");
@@ -250,7 +254,7 @@ class LaravelBrewCommand extends Command
                         $this->line("  Details: <fg=gray>{$tracking['statusDetails']}</>");
                     }
                 }
-                
+
                 $this->newLine();
             }
 
@@ -267,16 +271,16 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching profile', function () {
             $response = $this->apiRequest('GET', '/profile');
-            
+
             $user = $response['user'] ?? null;
-            if (!$user) {
+            if (! $user) {
                 throw new \Exception('Unable to fetch profile');
             }
 
             $this->newLine();
             $this->components->info('Your Profile:');
             $this->newLine();
-            
+
             $this->components->twoColumnDetail('ID:', $user['id']);
             $this->components->twoColumnDetail('Name:', $user['name'] ?? 'Not set');
             $this->components->twoColumnDetail('Email:', $user['email'] ?? 'Not set');
@@ -296,8 +300,9 @@ class LaravelBrewCommand extends Command
         $addressId = $this->option('address') ?? $this->selectAddress();
         $cardId = $this->option('card') ?? $this->selectCard();
 
-        if (!$addressId || !$cardId) {
+        if (! $addressId || ! $cardId) {
             $this->components->error('Address and card are required for checkout');
+
             return self::FAILURE;
         }
 
@@ -328,14 +333,14 @@ class LaravelBrewCommand extends Command
     {
         $token = $this->getApiToken();
         $baseUrl = $this->option('sandbox') ? self::API_SANDBOX : self::API_PRODUCTION;
-        
+
         $response = Http::withHeaders([
             'Authorization' => "Bearer {$token}",
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ])->$method("{$baseUrl}{$endpoint}", $data);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             $error = $response->json();
             throw new \Exception($error['message'] ?? 'API request failed');
         }
@@ -373,6 +378,7 @@ class LaravelBrewCommand extends Command
 
         if (empty($addresses)) {
             $this->components->warn('No addresses found. Please add an address first.');
+
             return null;
         }
 
@@ -395,6 +401,7 @@ class LaravelBrewCommand extends Command
 
         if (empty($cards)) {
             $this->components->warn('No cards found. Please add a payment method first.');
+
             return null;
         }
 
@@ -414,9 +421,10 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching addresses', function () {
             $response = $this->apiRequest('GET', '/address');
-            
+
             if (empty($response['data'])) {
                 $this->components->warn('No addresses found');
+
                 return true;
             }
 
@@ -430,12 +438,12 @@ class LaravelBrewCommand extends Command
                     "<fg=gray>{$address['id']}</>"
                 );
                 $this->line("  {$address['street1']}");
-                if (!empty($address['street2'])) {
+                if (! empty($address['street2'])) {
                     $this->line("  {$address['street2']}");
                 }
                 $this->line("  {$address['city']}, {$address['province']} {$address['zip']}");
                 $this->line("  {$address['country']}");
-                if (!empty($address['phone'])) {
+                if (! empty($address['phone'])) {
                     $this->line("  Phone: {$address['phone']}");
                 }
                 $this->newLine();
@@ -454,9 +462,10 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching cards', function () {
             $response = $this->apiRequest('GET', '/card');
-            
+
             if (empty($response['data'])) {
                 $this->components->warn('No payment methods found');
+
                 return true;
             }
 
@@ -488,9 +497,10 @@ class LaravelBrewCommand extends Command
     {
         $this->components->task('Fetching subscriptions', function () {
             $response = $this->apiRequest('GET', '/subscription');
-            
+
             if (empty($response['data'])) {
                 $this->components->warn('No active subscriptions');
+
                 return true;
             }
 
@@ -500,14 +510,14 @@ class LaravelBrewCommand extends Command
 
             foreach ($response['data'] as $subscription) {
                 $this->components->twoColumnDetail(
-                    "Subscription",
+                    'Subscription',
                     "<fg=gray>{$subscription['id']}</>"
                 );
                 $this->line("  Product: <fg=yellow>{$subscription['productVariantID']}</>");
                 $price = number_format($subscription['price'] / 100, 2);
                 $this->line("  Price: <fg=green>\${$price}</>");
                 $this->line("  Quantity: {$subscription['quantity']}");
-                
+
                 if (isset($subscription['schedule'])) {
                     $schedule = $subscription['schedule'];
                     if ($schedule['type'] === 'weekly') {
@@ -516,12 +526,12 @@ class LaravelBrewCommand extends Command
                         $this->line("  Schedule: {$schedule['type']}");
                     }
                 }
-                
+
                 if (isset($subscription['next'])) {
                     $next = date('Y-m-d', strtotime($subscription['next']));
                     $this->line("  Next delivery: <fg=cyan>{$next}</>");
                 }
-                
+
                 $this->newLine();
             }
 

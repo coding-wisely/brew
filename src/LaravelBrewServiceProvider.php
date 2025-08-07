@@ -2,9 +2,9 @@
 
 namespace CodingWisely\LaravelBrew;
 
+use CodingWisely\LaravelBrew\Commands\LaravelBrewCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use CodingWisely\LaravelBrew\Commands\LaravelBrewCommand;
 
 class LaravelBrewServiceProvider extends PackageServiceProvider
 {
