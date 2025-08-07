@@ -200,7 +200,7 @@ it('shows help information', function () {
 it('requires variant id for ordering', function () {
     $this->artisan('brew', ['action' => 'order'])
         ->expectsOutput('☕ Laravel Brew - Terminal Shop Integration')
-        ->expectsOutputToContain('Please specify a variant ID')
+        ->expectsOutput('Please specify a variant ID with --variant=')
         ->assertFailed();
 });
 

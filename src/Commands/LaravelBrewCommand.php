@@ -45,7 +45,7 @@ class LaravelBrewCommand extends Command
     {
         $action = $this->argument('action') ?? 'list';
 
-        $this->components->info('☕ Laravel Brew - Terminal Shop Integration');
+        $this->info('☕ Laravel Brew - Terminal Shop Integration');
 
         try {
             return match ($action) {
@@ -60,7 +60,7 @@ class LaravelBrewCommand extends Command
                 default => $this->showHelp(),
             };
         } catch (\Exception $e) {
-            $this->components->error("Error: {$e->getMessage()}");
+            $this->error("Error: {$e->getMessage()}");
 
             return self::FAILURE;
         }
@@ -122,7 +122,7 @@ class LaravelBrewCommand extends Command
         $subscribe = $this->option('subscribe');
 
         if (! $variantId) {
-            $this->components->error('Please specify a variant ID with --variant=');
+            $this->error('Please specify a variant ID with --variant=');
 
             return self::FAILURE;
         }
@@ -301,7 +301,7 @@ class LaravelBrewCommand extends Command
         $cardId = $this->option('card') ?? $this->selectCard();
 
         if (! $addressId || ! $cardId) {
-            $this->components->error('Address and card are required for checkout');
+            $this->error('Address and card are required for checkout');
 
             return self::FAILURE;
         }
@@ -547,7 +547,6 @@ class LaravelBrewCommand extends Command
     protected function showHelp(): int
     {
         $this->newLine();
-        $this->line('☕ <fg=yellow>Laravel Brew - Terminal Shop Integration</>');
         $this->line('Order coffee directly from your terminal!');
         $this->newLine();
         $this->line('<fg=cyan>Available Actions:</>');
