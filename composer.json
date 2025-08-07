@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "coding-wisely/laravel-brew",
+    "description": "This is my package laravel-brew",
     "keywords": [
-        ":vendor_name",
+        "CodingWisely",
         "laravel",
-        ":package_slug"
+        "laravel-brew"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/coding-wisely/laravel-brew",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Vladimir Nikolic",
+            "email": "vladimir@codingwisely.com",
             "role": "Developer"
         }
     ],
@@ -30,18 +30,16 @@
         "pestphp/pest-plugin-laravel": "^2.0||^3.0",
         "phpstan/extension-installer": "^1.3",
         "phpstan/phpstan-deprecation-rules": "^1.1||^2.0",
-        "phpstan/phpstan-phpunit": "^1.3||^2.0",
-        "spatie/laravel-ray": "^1.35"
+        "phpstan/phpstan-phpunit": "^1.3||^2.0"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "CodingWisely\\LaravelBrew\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "CodingWisely\\LaravelBrew\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +61,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "CodingWisely\\LaravelBrew\\LaravelBrewServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "LaravelBrew": "CodingWisely\\LaravelBrew\\Facades\\LaravelBrew"
             }
         }
     },
